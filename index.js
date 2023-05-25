@@ -22,6 +22,7 @@ let init = () => {
     inquirer.prompt(questions)
     .then(data => {
         console.log(data);
+        init();
     })
 }
 
