@@ -117,4 +117,20 @@ let addDepartment = () => {
       message: 'please enter a new department name: ',
     },
   ])
+  .then((data) => {
+    const {departmentName} = data ;
+
+    // db.query(
+    //   'INSERT INTO department (nameOfNewDept) VALUES ?',
+    //   departmentName,
+
+    // )
+    db.query(`INSERT INTO department (DepartmentName) VALUES (?)`, [departmentName], (err, result) => {
+      if (err) {
+        console.log(err);
+      }
+      console.log(result);
+      init();
+    });
+  })
 }
