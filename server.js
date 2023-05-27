@@ -57,13 +57,12 @@ let init = () => {
         switch(databaseFunction){
           case 'view all departments':
             //function to view departments
+            viewAllDepartments();
             break;
           case 'view all roles':
             //function to view roles
             break;
           case 'view all employees':
-            //function to view employess
-
             viewAllEmployees();
             break;
           case 'add a department':
@@ -87,10 +86,19 @@ let init = () => {
 
 init();
 
+//function to view departments
+let viewAllDepartments = () => {
+  db.query('SELECT * FROM department', function (err, results) {
+    console.log(results);
+    init();
+  });
+}
+
 
 //function to view all employees
 let viewAllEmployees = () => {
   db.query('SELECT * FROM employee', function (err, results) {
     console.log(results);
+    init();
   });
 }
