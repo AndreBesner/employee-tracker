@@ -40,7 +40,7 @@ const questions = [
       "add a department",
       "add a role",
       "add an employee",
-      "update an employee role"
+      "update an employee role",
     ],
   },
 ];
@@ -64,7 +64,7 @@ let init = () => {
         viewAllEmployees();
         break;
       case "add a department":
-        //function to add deparment
+        addDepartment();
         break;
       case "add a role":
         //function to add role
@@ -106,3 +106,15 @@ let viewAllEmployees = () => {
     init();
   });
 };
+
+
+//function to add a department
+let addDepartment = () => {
+  inquirer.prompt([
+    {
+      type: 'input',
+      name: 'departmentName',
+      message: 'please enter a new department name: ',
+    },
+  ])
+}
