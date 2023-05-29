@@ -28,6 +28,7 @@ app.listen(PORT, () => {
 
 // inquirer
 const inquirer = require("inquirer");
+// import inquirer from 'inquirer';
 
 const questions = [
   {
@@ -68,6 +69,7 @@ let init = () => {
         break;
       case "add a role":
         //function to add role
+        addRole();
         break;
       case "add an employee":
         //function to add employee
@@ -144,28 +146,30 @@ let addRole = () => {
     }
 
     //make array for inquirer promps
-    const departmentsArray = departments.map(
-      (department) => department.departmentName
-    );
+    // const departmentsArray = departments.map(
+    //   (department) => department.departmentName
+    // );
+
+    const departmentChoices = departments.map((department) => department.DepartmentName);
 
     inquirer
       .prompt([
         {
           type: "input",
           name: "roleName",
-          message: "please enter a new role name: ",
+          message: "please enter a new role name:",
         },
         {
           type: "input",
           name: "roleSalary",
-          message: "please enter a role salary: ",
+          message: "please enter a role salary:",
         },
         {
           type: "list",
           name: "departmentName",
           message:
             "please select a department from this list of existing departments.",
-          choices: departmentsArray,
+          choices: departmentChoices,
         },
       ])
       .then((data) => {
@@ -191,19 +195,4 @@ let addRole = () => {
         );
       });
   });
-
-  //   .then((data) => {
-  //     const { roleName } = data;
-  //     db.query(
-  //       `INSERT INTO role (RoleName) VALUES (?)`,
-  //       [roleName],
-  //       (err, result) => {
-  //         if (err) {
-  //           console.log(err);
-  //         }
-  //         console.log(result);
-  //         init();
-  //       }
-  //     );
-  //   });
 };
