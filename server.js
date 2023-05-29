@@ -192,3 +192,68 @@ let addRole = () => {
       });
   });
 };
+
+
+let addEmployee = () => {
+  //query related tables
+  const rolesQuery = "SELECT * FROM role";
+
+  db.query(rolesQuery, (err, roles) => {
+    if (err){
+      console.log(err);
+      return;
+    }
+
+    const roleChoices = roles.map((role) => role.RoleName);
+
+    const managerQuery = "SELECT CONCAT(a.FirstName, ' ', a.LastName) AS manager_name FROM employee a INNER JOIN employee b ON a.EmployeeID = b.ManagerID" ;
+
+    db.query(managerQuery, (err, managers) => {
+      if(err){
+        console.log(err);
+        return
+      }
+
+      const managerChoices = results.map((row) => row.manager_name);
+
+      inquirer
+      .prompt([
+        {
+          type: "input",
+          name: "employeeFirstName",
+          message: "please enter a new employee first name:",
+        },
+        {
+          type: "input",
+          name: "employeeLastName",
+          message: "please enter a new employee last name:",
+        },
+        {
+          type: "list",
+          name: "employeeRole",
+          message: "please enter an employee role:",
+          choices: roleChoices,
+        },
+        {
+          type: "list",
+          name: "managerName",
+          message:
+            "please select a manager from this list of existing managers.",
+          choices: managerChoices,
+        },
+      ])
+      .then((data) => {
+
+        //deconstruction
+        const { employeeFirstName, employeeLastName, employeeRole, managerName } = data ;
+
+
+        
+
+      })
+
+
+    })
+
+  })
+};
