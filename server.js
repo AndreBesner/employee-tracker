@@ -48,8 +48,8 @@ const questions = [
 //this calls inquirer and takes selection and runs corresponding function
 let init = () => {
   inquirer.prompt(questions).then((data) => {
-    // console.log(data);
     // take answers and make object to run switch statement
+    // destructure to remove .data notation
     const { databaseFunction } = data;
     //make switchase to run function correspoding to chosen option
     switch (databaseFunction) {
@@ -107,30 +107,103 @@ let viewAllEmployees = () => {
   });
 };
 
-
 //function to add a department
 let addDepartment = () => {
-  inquirer.prompt([
-    {
-      type: 'input',
-      name: 'departmentName',
-      message: 'please enter a new department name: ',
-    },
-  ])
-  .then((data) => {
-    const {departmentName} = data ;
-
-    // db.query(
-    //   'INSERT INTO department (nameOfNewDept) VALUES ?',
-    //   departmentName,
-
-    // )
-    db.query(`INSERT INTO department (DepartmentName) VALUES (?)`, [departmentName], (err, result) => {
-      if (err) {
-        console.log(err);
-      }
-      console.log(result);
-      init();
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "departmentName",
+        message: "please enter a new department name: ",
+      },
+    ])
+    .then((data) => {
+      const { departmentName } = data;
+      db.query(
+        `INSERT INTO department (DepartmentName) VALUES (?)`,
+        [departmentName],
+        (err, result) => {
+          if (err) {
+            console.log(err);
+          }
+          console.log(result);
+          init();
+        }
+      );
     });
-  })
-}
+};
+
+let addRole = () => {
+  //get departments table queried
+  const departmentsQuery = "SELECT * FROM department";
+
+  db.query(departmentsQuery, (err, departments) => {
+    if (err) {
+      console.log(err);
+      return;
+    }
+
+    //make array for inquirer promps
+    const departmentsArray = departments.map(
+      (department) => department.departmentName
+    );
+
+    inquirer
+      .prompt([
+        {
+          type: "input",
+          name: "roleName",
+          message: "please enter a new role name: ",
+        },
+        {
+          type: "input",
+          name: "roleSalary",
+          message: "please enter a role salary: ",
+        },
+        {
+          type: "list",
+          name: "departmentName",
+          message:
+            "please select a department from this list of existing departments.",
+          choices: departmentsArray,
+        },
+      ])
+      .then((data) => {
+        // Destructure the answers
+        const { roleName, roleSalary, departmentName } = data;
+
+        // Find the department object that matches the selected department name and get its ID
+        const departmentID = departments.find(
+          (department) => department.departmentName === departmentName
+        ).id;
+
+        // Insert the role into the database
+        db.query(
+          "INSERT INTO role (RoleName, RoleSalary, DepartmentID) VALUES (?, ?, ?)",
+          [roleName, roleSalary, departmentID],
+          (err, result) => {
+            if (err) {
+              console.log(err);
+            }
+            console.log(result);
+            init();
+          }
+        );
+      });
+  });
+
+  //   .then((data) => {
+  //     const { roleName } = data;
+  //     db.query(
+  //       `INSERT INTO role (RoleName) VALUES (?)`,
+  //       [roleName],
+  //       (err, result) => {
+  //         if (err) {
+  //           console.log(err);
+  //         }
+  //         console.log(result);
+  //         init();
+  //       }
+  //     );
+  //   });
+};
