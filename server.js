@@ -145,11 +145,6 @@ let addRole = () => {
       return;
     }
 
-    //make array for inquirer promps
-    // const departmentsArray = departments.map(
-    //   (department) => department.departmentName
-    // );
-
     const departmentChoices = departments.map((department) => department.DepartmentName);
 
     inquirer
@@ -173,18 +168,18 @@ let addRole = () => {
         },
       ])
       .then((data) => {
+
+        // console.log(data);
+
+        // const departmentID = data.map()
+
         // Destructure the answers
         const { roleName, roleSalary, departmentName } = data;
+        
 
-        // Find the department object that matches the selected department name and get its ID
-        const departmentID = departments.find(
-          (department) => department.departmentName === departmentName
-        ).id;
-
-        // Insert the role into the database
         db.query(
-          "INSERT INTO role (RoleName, RoleSalary, DepartmentID) VALUES (?, ?, ?)",
-          [roleName, roleSalary, departmentID],
+          "INSERT INTO role (RoleName, RoleSalary, DepartmentID) VALUES (?, ?, (SELECT DepartmentID FROM department WHERE DepartmentName = ?));",
+          [roleName, roleSalary, departmentName],
           (err, result) => {
             if (err) {
               console.log(err);
@@ -193,6 +188,7 @@ let addRole = () => {
             init();
           }
         );
+
       });
   });
 };
