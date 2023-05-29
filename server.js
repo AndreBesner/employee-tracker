@@ -73,6 +73,7 @@ let init = () => {
         break;
       case "add an employee":
         //function to add employee
+        addEmployee();
         break;
       case "update an employee role":
         //function to update employee role:
@@ -145,7 +146,9 @@ let addRole = () => {
       return;
     }
 
-    const departmentChoices = departments.map((department) => department.DepartmentName);
+    const departmentChoices = departments.map(
+      (department) => department.DepartmentName
+    );
 
     inquirer
       .prompt([
@@ -168,14 +171,12 @@ let addRole = () => {
         },
       ])
       .then((data) => {
-
         // console.log(data);
 
         // const departmentID = data.map()
 
         // Destructure the answers
         const { roleName, roleSalary, departmentName } = data;
-        
 
         db.query(
           "INSERT INTO role (RoleName, RoleSalary, DepartmentID) VALUES (?, ?, (SELECT DepartmentID FROM department WHERE DepartmentName = ?));",
@@ -188,72 +189,81 @@ let addRole = () => {
             init();
           }
         );
-
       });
   });
 };
 
-
 let addEmployee = () => {
   //query related tables
-  const rolesQuery = "SELECT * FROM role";
+  const addEmployeeQuery = "SELECT * FROM role, employee";
 
-  db.query(rolesQuery, (err, roles) => {
-    if (err){
+  db.query(addEmployeeQuery, (err, data) => {
+    if (err) {
       console.log(err);
       return;
     }
 
-    const roleChoices = roles.map((role) => role.RoleName);
+    // const roleChoices = roles.map((role) => role.RoleName);
 
-    const managerQuery = "SELECT CONCAT(a.FirstName, ' ', a.LastName) AS manager_name FROM employee a INNER JOIN employee b ON a.EmployeeID = b.ManagerID" ;
+    // const managerQuery =
+    //   "SELECT CONCAT(a.FirstName, ' ', a.LastName) AS manager_name FROM employee a INNER JOIN employee b ON a.EmployeeID = b.ManagerID";
 
-    db.query(managerQuery, (err, managers) => {
-      if(err){
-        console.log(err);
-        return
-      }
+    
 
-      const managerChoices = results.map((row) => row.manager_name);
+      // const managerChoices = results.map((row) => row.manager_name);
 
       inquirer
-      .prompt([
-        {
-          type: "input",
-          name: "employeeFirstName",
-          message: "please enter a new employee first name:",
-        },
-        {
-          type: "input",
-          name: "employeeLastName",
-          message: "please enter a new employee last name:",
-        },
-        {
-          type: "list",
-          name: "employeeRole",
-          message: "please enter an employee role:",
-          choices: roleChoices,
-        },
-        {
-          type: "list",
-          name: "managerName",
-          message:
-            "please select a manager from this list of existing managers.",
-          choices: managerChoices,
-        },
-      ])
-      .then((data) => {
+        .prompt([
+          {
+            type: "input",
+            name: "employeeFirstName",
+            message: "please enter a new employee first name:",
+          },
+          {
+            type: "input",
+            name: "employeeLastName",
+            message: "please enter a new employee last name:",
+          },
+          {
+            type: "list",
+            name: "employeeRole",
+            message: "please enter an employee role:",
+            choices: () => {
+              let array = [];
+              for (let i = 0; i < data.length; i++) {
+                array.push(data[i].RoleName);
+              }
+              var newArray = [...new Set(array)];
+              return newArray;
+            },
+          },
+          {
+            type: "list",
+            name: "managerName",
+            message:
+              "please select a manager from this list of existing managers.",
+            validate: managerInput => {
+              if (managerInput) {
+                  return true;
+                } else {
+                    console.log('Please Add A Manager!');
+                    return false;
+                }
+            },
+          },
+        ])
+        .then((answers) => {
+          //deconstruction
+          const {
+            employeeFirstName,
+            employeeLastName,
+            employeeRole,
+            managerName,
+          } = answers;
 
-        //deconstruction
-        const { employeeFirstName, employeeLastName, employeeRole, managerName } = data ;
-
-
-        
-
-      })
-
-
-    })
-
-  })
+          // for(let i = 0 ; i < data.length ; i++){
+          //   if(results[i].ManagerName === )
+          // }
+        });
+  });
 };
