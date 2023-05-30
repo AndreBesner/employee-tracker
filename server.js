@@ -203,14 +203,6 @@ let addEmployee = () => {
       return;
     }
 
-    // const roleChoices = roles.map((role) => role.RoleName);
-
-    // const managerQuery =
-    //   "SELECT CONCAT(a.FirstName, ' ', a.LastName) AS manager_name FROM employee a INNER JOIN employee b ON a.EmployeeID = b.ManagerID";
-
-    
-
-      // const managerChoices = results.map((row) => row.manager_name);
 
       inquirer
         .prompt([
@@ -238,7 +230,7 @@ let addEmployee = () => {
             },
           },
           {
-            type: "list",
+            type: "input",
             name: "managerName",
             message:
               "please select a manager from this list of existing managers.",
@@ -261,9 +253,25 @@ let addEmployee = () => {
             managerName,
           } = answers;
 
-          // for(let i = 0 ; i < data.length ; i++){
-          //   if(results[i].ManagerName === )
-          // }
+          let newRole;
+         
+
+
+          for (var i = 0 ; i < data.length ; i++){
+            if(data[i].RoleID === employeeRole){
+              newRole = data[i];
+            }
+          }
+
+          db.query("INSERT INTO employee (FirstName, LastName, RoleID, ManagerID) VALUES (?, ?, ?, ?)", [employeeFirstName, employeeLastName, newRole, managerName.ManagerID], (err, result) => {
+            if (err){
+              console.log(err);
+              return;
+            }
+            console.log("YOU DID IT!");
+            init();
+          })
+
         });
   });
 };
