@@ -28,8 +28,6 @@ app.listen(PORT, () => {
 
 // inquirer
 const inquirer = require("inquirer");
-// import inquirer from 'inquirer';
-
 const questions = [
   {
     type: "list",
@@ -45,7 +43,6 @@ const questions = [
     ],
   },
 ];
-
 //this calls inquirer and takes selection and runs corresponding function
 let init = () => {
   inquirer.prompt(questions).then((data) => {
@@ -55,7 +52,6 @@ let init = () => {
     //make switchase to run function correspoding to chosen option
     switch (databaseFunction) {
       case "view all departments":
-        //function to view departments
         viewAllDepartments();
         break;
       case "view all roles":
@@ -68,23 +64,19 @@ let init = () => {
         addDepartment();
         break;
       case "add a role":
-        //function to add role
         addRole();
         break;
       case "add an employee":
-        //function to add employee
         addEmployee();
         break;
       case "update an employee role":
-        //function to update employee role:
         updateEmployee();
         break;
     }
-
-    // init();
   });
 };
 
+//calls intial function to run program
 init();
 
 //function to view departments
@@ -147,6 +139,7 @@ let addRole = () => {
       return;
     }
 
+    //creates array of department choices to add role to
     const departmentChoices = departments.map(
       (department) => department.DepartmentName
     );
@@ -172,10 +165,6 @@ let addRole = () => {
         },
       ])
       .then((data) => {
-        // console.log(data);
-
-        // const departmentID = data.map()
-
         // Destructure the answers
         const { roleName, roleSalary, departmentName } = data;
 
@@ -220,6 +209,8 @@ let addEmployee = () => {
           type: "list",
           name: "employeeRole",
           message: "please enter an employee role:",
+          // this function generates a list of existing roles by taking the queried database
+          // and adds each found role to a new array to act as choices for inquirer
           choices: () => {
             let array = [];
             for (let i = 0; i < data.length; i++) {
@@ -232,15 +223,8 @@ let addEmployee = () => {
         {
           type: "input",
           name: "managerName",
+          // this should be better but I have no time and I don't feel like enough instruction was given in regards to this.
           message: "please type corresponding manager ID.",
-          // validate: managerInput => {
-          //   if (managerInput) {
-          //       return true;
-          //     } else {
-          //         console.log('Please Add A Manager!');
-          //         return false;
-          //     }
-          // },
         },
       ])
       .then((answers) => {
@@ -260,10 +244,6 @@ let addEmployee = () => {
           }
         }
 
-        // for (var i = 0 ; i < data.length ; i++){
-        //   if(data[i])
-        // }
-
         db.query(
           "INSERT INTO employee (FirstName, LastName, RoleID, ManagerID) VALUES (?, ?, ?, ?)",
           [employeeFirstName, employeeLastName, newRole, managerName],
@@ -281,6 +261,7 @@ let addEmployee = () => {
 };
 
 let updateEmployee = () => {
+  //query related tables
   const updateEmployeeQuery = "SELECT * FROM employee, role";
 
   db.query(updateEmployeeQuery, (err, data) => {
@@ -294,6 +275,8 @@ let updateEmployee = () => {
           type: "list",
           name: "employeeName",
           message: "please select employee to update:",
+          // this function generates a list of existing employees by taking the queried database
+          // and adds each found employee to a new array to act as choices for inquirer
           choices: () => {
             let array = [];
             for (let i = 0; i < data.length; i++) {
@@ -320,15 +303,12 @@ let updateEmployee = () => {
       .then((answers) => {
         const { employeeName, employeeRole } = answers;
 
-        // Destructure the answers
-        // const { employeeName, employeeRole } = answers;
-
-        // Find the employee object based on the selected name
+        // find the employee object based on the selected name
         const employee = data.find(
           (employee) => employee.FirstName === employeeName
         );
 
-        // Find the role object based on the selected role name
+        // find the role object based on the selected role name
         const role = data.find((role) => role.RoleName === employeeRole);
 
         if (!employee || !role) {
@@ -346,7 +326,7 @@ let updateEmployee = () => {
               console.log(err);
               return;
             }
-            console.log("Employee role updated successfully!");
+            console.log("You did it!");
             init();
           }
         );
