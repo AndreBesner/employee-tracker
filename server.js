@@ -311,6 +311,7 @@ let updateEmployee = () => {
         // find the role object based on the selected role name
         const role = data.find((role) => role.RoleName === employeeRole);
 
+        // error checking to make sure both promps were answered
         if (!employee || !role) {
           console.log("Invalid selection. Please try again.");
           init();
