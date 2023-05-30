@@ -233,15 +233,15 @@ let addEmployee = () => {
             type: "input",
             name: "managerName",
             message:
-              "please select a manager from this list of existing managers.",
-            validate: managerInput => {
-              if (managerInput) {
-                  return true;
-                } else {
-                    console.log('Please Add A Manager!');
-                    return false;
-                }
-            },
+              "please type corresponding manager ID.",
+            // validate: managerInput => {
+            //   if (managerInput) {
+            //       return true;
+            //     } else {
+            //         console.log('Please Add A Manager!');
+            //         return false;
+            //     }
+            // },
           },
         ])
         .then((answers) => {
@@ -263,7 +263,11 @@ let addEmployee = () => {
             }
           }
 
-          db.query("INSERT INTO employee (FirstName, LastName, RoleID, ManagerID) VALUES (?, ?, ?, ?)", [employeeFirstName, employeeLastName, newRole, managerName.ManagerID], (err, result) => {
+          // for (var i = 0 ; i < data.length ; i++){
+          //   if(data[i])
+          // }
+
+          db.query("INSERT INTO employee (FirstName, LastName, RoleID, ManagerID) VALUES (?, ?, ?, ?)", [employeeFirstName, employeeLastName, newRole, managerName], (err, result) => {
             if (err){
               console.log(err);
               return;
