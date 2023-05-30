@@ -185,7 +185,7 @@ let addRole = () => {
 
 let addEmployee = () => {
   //query related tables
-  const addEmployeeQuery = "SELECT * FROM role, employee";
+  const addEmployeeQuery = "SELECT role.*, employee.* FROM role JOIN employee ON role.RoleID = employee.RoleID";
 
   db.query(addEmployeeQuery, (err, data) => {
     if (err) {
@@ -239,8 +239,8 @@ let addEmployee = () => {
         let newRole;
 
         for (var i = 0; i < data.length; i++) {
-          if (data[i].RoleID === employeeRole) {
-            newRole = data[i];
+          if (data[i].RoleName === employeeRole) {
+            newRole = data[i].RoleID;
           }
         }
 
@@ -311,6 +311,7 @@ let updateEmployee = () => {
         // find the role object based on the selected role name
         const role = data.find((role) => role.RoleName === employeeRole);
 
+        // error checking to make sure both promps were answered
         if (!employee || !role) {
           console.log("Invalid selection. Please try again.");
           init();
