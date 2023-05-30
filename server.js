@@ -77,6 +77,7 @@ let init = () => {
         break;
       case "update an employee role":
         //function to update employee role:
+        updateEmployee();
         break;
     }
 
@@ -203,79 +204,152 @@ let addEmployee = () => {
       return;
     }
 
-
-      inquirer
-        .prompt([
-          {
-            type: "input",
-            name: "employeeFirstName",
-            message: "please enter a new employee first name:",
-          },
-          {
-            type: "input",
-            name: "employeeLastName",
-            message: "please enter a new employee last name:",
-          },
-          {
-            type: "list",
-            name: "employeeRole",
-            message: "please enter an employee role:",
-            choices: () => {
-              let array = [];
-              for (let i = 0; i < data.length; i++) {
-                array.push(data[i].RoleName);
-              }
-              var newArray = [...new Set(array)];
-              return newArray;
-            },
-          },
-          {
-            type: "input",
-            name: "managerName",
-            message:
-              "please type corresponding manager ID.",
-            // validate: managerInput => {
-            //   if (managerInput) {
-            //       return true;
-            //     } else {
-            //         console.log('Please Add A Manager!');
-            //         return false;
-            //     }
-            // },
-          },
-        ])
-        .then((answers) => {
-          //deconstruction
-          const {
-            employeeFirstName,
-            employeeLastName,
-            employeeRole,
-            managerName,
-          } = answers;
-
-          let newRole;
-         
-
-
-          for (var i = 0 ; i < data.length ; i++){
-            if(data[i].RoleID === employeeRole){
-              newRole = data[i];
+    inquirer
+      .prompt([
+        {
+          type: "input",
+          name: "employeeFirstName",
+          message: "please enter a new employee first name:",
+        },
+        {
+          type: "input",
+          name: "employeeLastName",
+          message: "please enter a new employee last name:",
+        },
+        {
+          type: "list",
+          name: "employeeRole",
+          message: "please enter an employee role:",
+          choices: () => {
+            let array = [];
+            for (let i = 0; i < data.length; i++) {
+              array.push(data[i].RoleName);
             }
+            var newArray = [...new Set(array)];
+            return newArray;
+          },
+        },
+        {
+          type: "input",
+          name: "managerName",
+          message: "please type corresponding manager ID.",
+          // validate: managerInput => {
+          //   if (managerInput) {
+          //       return true;
+          //     } else {
+          //         console.log('Please Add A Manager!');
+          //         return false;
+          //     }
+          // },
+        },
+      ])
+      .then((answers) => {
+        //deconstruction
+        const {
+          employeeFirstName,
+          employeeLastName,
+          employeeRole,
+          managerName,
+        } = answers;
+
+        let newRole;
+
+        for (var i = 0; i < data.length; i++) {
+          if (data[i].RoleID === employeeRole) {
+            newRole = data[i];
           }
+        }
 
-          // for (var i = 0 ; i < data.length ; i++){
-          //   if(data[i])
-          // }
+        // for (var i = 0 ; i < data.length ; i++){
+        //   if(data[i])
+        // }
 
-          db.query("INSERT INTO employee (FirstName, LastName, RoleID, ManagerID) VALUES (?, ?, ?, ?)", [employeeFirstName, employeeLastName, newRole, managerName], (err, result) => {
-            if (err){
+        db.query(
+          "INSERT INTO employee (FirstName, LastName, RoleID, ManagerID) VALUES (?, ?, ?, ?)",
+          [employeeFirstName, employeeLastName, newRole, managerName],
+          (err, result) => {
+            if (err) {
               console.log(err);
               return;
             }
             console.log("YOU DID IT!");
             init();
-          })
+          }
+        );
+      });
+  });
+};
 
-        });
+let updateEmployee = () => {
+  const updateEmployeeQuery = "SELECT * FROM employee, role";
+
+  db.query(updateEmployeeQuery, (err, data) => {
+    if (err) {
+      console.log(err);
+      return;
+    }
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          name: "employeeName",
+          message: "please select employee to update:",
+          choices: () => {
+            let array = [];
+            for (let i = 0; i < data.length; i++) {
+              array.push(data[i].FirstName);
+            }
+            var employeeArray = [...new Set(array)];
+            return employeeArray;
+          },
+        },
+        {
+          type: "list",
+          name: "employeeRole",
+          message: "please select a new employee role:",
+          choices: () => {
+            let array = [];
+            for (let i = 0; i < data.length; i++) {
+              array.push(data[i].RoleName);
+            }
+            var roleArray = [...new Set(array)];
+            return roleArray;
+          },
+        },
+      ])
+      .then((answers) => {
+        const { employeeName, employeeRole } = answers;
+
+        // Destructure the answers
+        // const { employeeName, employeeRole } = answers;
+
+        // Find the employee object based on the selected name
+        const employee = data.find(
+          (employee) => employee.FirstName === employeeName
+        );
+
+        // Find the role object based on the selected role name
+        const role = data.find((role) => role.RoleName === employeeRole);
+
+        if (!employee || !role) {
+          console.log("Invalid selection. Please try again.");
+          init();
+          return;
+        }
+
+        // Update the employee's role in the database
+        db.query(
+          "UPDATE employee SET RoleID = ? WHERE EmployeeID = ?",
+          [role.RoleID, employee.EmployeeID],
+          (err, result) => {
+            if (err) {
+              console.log(err);
+              return;
+            }
+            console.log("Employee role updated successfully!");
+            init();
+          }
+        );
+      });
   });
 };
