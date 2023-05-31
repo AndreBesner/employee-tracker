@@ -28,6 +28,8 @@ Please use this project as you wish. The commands when you launch the program us
 
 When you are finished please press `cntrl+c` to cancel.
 
+![working site](./assets/Working%20Program.JPG)
+
 
 
 ## Credits
